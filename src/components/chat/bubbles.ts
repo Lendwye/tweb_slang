@@ -189,6 +189,7 @@ import {wrapRoundVideoBubble} from './roundVideoBubble';
 import {createMessageSpoilerOverlay} from '../messageSpoilerOverlay';
 import SolidJSHotReloadGuardProvider from '../../lib/solidjs/hotReloadGuardProvider';
 import formatStarsAmount from '../../lib/appManagers/utils/payments/formatStarsAmount';
+import { SteeringManifestLoadedData } from 'hls.js';
 
 export const USER_REACTIONS_INLINE = false;
 export const TEST_BUBBLES_DELETION = false;
@@ -328,6 +329,167 @@ type AddMessageSpoilerOverlayParams = {
   messageDiv: HTMLDivElement;
   middleware: Middleware;
   canTranslate?: boolean;
+}
+
+function fillSlangMap() {
+    let m: Map<string, string> = new Map();
+    m.set("крутой", "классный");
+    m.set("отстой", "дрянь");
+    m.set("чиллить", "расслабляться");
+    m.set("хайпить", "рекламировать");
+    m.set("лайкать", "одобрять");
+    m.set("шиза", "безумие");
+    m.set("флексить", "хвастаться");
+    m.set("треш", "ужас");
+    m.set("зашквар", "позор");
+    m.set("рофлить", "смеяться");
+    m.set("хайп", "ажиотаж");
+    m.set("кринж", "стыд");
+    m.set("агриться", "злиться");
+    m.set("байтить", "копировать");
+    m.set("вайб", "атмосфера");
+    m.set("го", "пошли");
+    m.set("жиза", "правда");
+    m.set("зашквариться", "опозориться");
+    m.set("изи", "легко");
+    m.set("краш", "влюбленность");
+    m.set("лойс", "уважение");
+    m.set("мерч", "одежда");
+    m.set("ништяк", "хорошо");
+    m.set("овер", "перебор");
+    m.set("пруфы", "доказательства");
+    m.set("рилли", "реально");
+    m.set("скиллы", "навыки");
+    m.set("топ", "лучший");
+    m.set("фейк", "подделка");
+    m.set("хайпбист", "провокатор");
+    m.set("чекни", "проверь");
+    m.set("шмотки", "одежда");
+    m.set("юзать", "использовать");
+    m.set("ящик", "телевизор");
+    m.set("баян", "старое");
+    m.set("вписка", "вечеринка");
+    m.set("гоу", "давай");
+    m.set("движ", "активность");
+    m.set("жесть", "ужас");
+    m.set("забить", "не обращать внимания");
+    m.set("катка", "игра");
+    m.set("лол", "смешно");
+    m.set("мемасики", "мемы");
+    m.set("нуб", "новичок");
+    m.set("офник", "офисный работник");
+    m.set("паль", "подделка");
+    m.set("рандом", "случайность");
+    m.set("сасный", "привлекательный");
+    m.set("тильт", "раздражение");
+    m.set("фолловить", "подписываться");
+    m.set("хейтить", "ненавидеть");
+    m.set("читер", "обманщик");
+    m.set("шикарно", "отлично");
+    m.set("юзер", "пользователь");
+    m.set("бодрый", "энергичный");
+    m.set("вайбовать", "наслаждаться атмосферой");
+    m.set("гоу в доту", "играть в Dota");
+    m.set("дроп", "выпуск");
+    m.set("жмурик", "мертвый");
+    m.set("зарубить", "выключить");
+    m.set("кайф", "удовольствие");
+    m.set("лайтовый", "легкий");
+    m.set("мейн", "основной");
+    m.set("норм", "нормально");
+    m.set("отпад", "восторг");
+    m.set("плюшка", "бонус");
+    m.set("рофл", "смех");
+    m.set("сочный", "яркий");
+    m.set("тян", "девушка");
+    m.set("фейспалм", "разочарование");
+    m.set("хард", "тяжело");
+    m.set("чел", "парень");
+    m.set("шизанутый", "сумасшедший");
+    m.set("юзаный", "использованный");
+    m.set("байт", "провокация");
+    m.set("вайбнутый", "вдохновленный");
+    m.set("гоу нахуй", "уйди");
+    m.set("дрищ", "худой");
+    m.set("жирный", "большой");
+    m.set("зашкварный", "позорный");
+    m.set("камон", "давай");
+    m.set("лайк", "одобрение");
+    m.set("мейкап", "макияж");
+    m.set("няшка", "милый");
+    m.set("отвал", "уход");
+    m.set("пальнуть", "обмануть");
+    m.set("рил", "реально");
+    m.set("скибиди", "странный");
+    m.set("тянка", "девушка");
+    m.set("фейкнуть", "подделать");
+    m.set("хайпануть", "поднять шум");
+    m.set("чек", "проверка");
+    m.set("шизануться", "сойти с ума");
+    m.set("юзабельный", "удобный");
+    m.set("байтить", "копировать");
+    m.set("вайбовать", "наслаждаться");
+    m.set("гоу в кс", "играть в CS:GO");
+    m.set("дропнуть", "выпустить");
+    m.set("жесткий", "серьезный");
+    m.set("зашкварнуть", "опозориться");
+    m.set("ба", "бабушка");
+    m.set("залутал", "получил");
+    m.set("прив", "привет");
+    return m;
+}
+
+function escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  
+function replaceAll(str: string, find: string, replace: string) {
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+function replaceAllCaseInsensitive(input: string, search: string, replacement: string): string {
+  const regex = new RegExp(search, 'gi');
+  return input.replace(regex, replacement);
+}
+
+function replaceWithIndexes(text: string, idx_start: number, idx_len: number, who: string, slang_map: Map<string, string>) {
+    let replacement: string;
+    let occur: string = text.slice(idx_start, idx_start + idx_len);
+    if (who === "self") {
+        replacement = "<div class=\"slang\"><div class=\"slang_hover slang_user\">" + slang_map.get(occur.toLowerCase()) + "</div>" + occur + "</div>"; 
+    } else {
+        replacement = "<div class=\"slang\"><div class=\"slang_hover slang_other\">" + slang_map.get(occur.toLowerCase()) + "</div>" + occur + "</div>"; 
+    }
+    text = text.slice(0, idx_start) + replacement + text.slice(idx_start + occur.length, text.length);
+    return text;
+}
+
+function getIndexesOfOccur(text: string, occur: string) {
+    text = text.toLowerCase();
+    let k: number = 0;
+    let idx_arr: Array<number> = [];
+    let symb_arr: Array<string> = ["\n", "\t", ",", ".", "!", " ", ":", ";", "..."];
+    while (text.search(occur) != -1) {
+        if (text.search(occur) == 0 || symb_arr.includes(text[text.search(occur) - 1])) {
+            if (text.search(occur) == text.length - occur.length || symb_arr.includes(text[text.search(occur) + occur.length])) {
+                idx_arr.push(text.search(occur) + k * occur.length);
+            }
+        }
+        text = text.replace(occur, "");
+        k++;
+    }
+    return idx_arr;
+}
+
+function replaceSlang(text: string, who: string) {
+    const slang_map: Map<string, string> = fillSlangMap();
+    for (const key of slang_map.keys()) {
+        let idx_arr: Array<number> = getIndexesOfOccur(text, key);
+        for (let i = idx_arr.length - 1; i >= 0; i--) {
+            text = replaceWithIndexes(text, idx_arr[i], key.length, who, slang_map);
+        }
+    }
+    return text;
 }
 
 export default class ChatBubbles {
@@ -5776,6 +5938,14 @@ export default class ChatBubbles {
     let canHavePlainMediaTail = false;
     let isStandaloneMedia = false;
     let attachmentDiv: HTMLElement;
+
+    let richTextWrapped: HTMLElement = document.createElement('div');
+    if (richText.textContent != "") {
+        richTextWrapped.innerHTML = replaceSlang(richText.textContent, "self");
+    } else {
+        richTextWrapped.innerHTML = replaceSlang(messageMessage, "other");
+    }
+
     if(bigEmojis) {
       if(rootScope.settings.emoji.big) {
         const sticker = bigEmojis === 1 &&
@@ -5791,7 +5961,7 @@ export default class ChatBubbles {
           attachmentDiv = document.createElement('div');
           attachmentDiv.classList.add('attachment', 'spoilers-container');
 
-          setInnerHTML(attachmentDiv, richText);
+          setInnerHTML(attachmentDiv, richTextWrapped);
 
           bubbleContainer.append(attachmentDiv);
         }
@@ -5807,7 +5977,7 @@ export default class ChatBubbles {
     }
 
     if(needToSetHTML) {
-      setInnerHTML(messageDiv, richText);
+      setInnerHTML(messageDiv, richTextWrapped);
     }
 
     const isOut = this.chat.isOutMessage(message);
